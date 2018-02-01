@@ -19,4 +19,9 @@ $router->get('/abc', function () {
     return 'Hello from the other side';
 });
 
-$router->post('auth/login', 'AuthController@postLogin');
+$router->post('auth/login', 'AuthController@authenticate');
+$router->post('auth/register', 'AuthController@register');
+
+$router->group(['middleware' => 'auth'], function () use ($router) {
+    $router->get('protected', 'AuthController@protected');
+});

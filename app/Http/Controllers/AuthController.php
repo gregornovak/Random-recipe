@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Tymon\JWTAuth\JWTAuth;
+use Laravel\Lumen\Exceptions;
+use Tymon\JWTAuth\{JWTAuth, Exceptions\TokenExpiredException, Exceptions\TokenInvalidException, Exceptions\JWTException};
 
 class AuthController extends Controller
 {
@@ -26,7 +28,6 @@ class AuthController extends Controller
     public function authenticate(Request $request)
     {
         $this->validate($request, [
-            'nickname' => 'required|min:3',
             'email'    => 'required|email|max:255',
             'password' => 'required',
         ]);
@@ -35,22 +36,46 @@ class AuthController extends Controller
                 return response()->json(['error' => ['text' => 'This user does not exist', 'err_num' => self::USER_DOES_NOT_EXIST]], 401);
             }
 
-        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+        } catch (TokenExpiredException $e) {
             return response()->json(['error' => ['text' => 'Token has expired', 'err_num' => self::USER_TOKEN_EXPIRED]], 500);
 
-        } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+        } catch (TokenInvalidException $e) {
             return response()->json(['error' => ['text' => 'Token is invalid', 'err_num' => self::USER_TOKEN_INVALID]], 500);
 
-        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+        } catch (JWTException $e) {
             return response()->json(['error' => ['text' => $e->getMessage(), 'err_num' => self::USER_NO_TOKEN_PROVIDED]], 500);
 
         }
 
-        return response()->json(compact('token'));
+        $user = $this->jwt->user();
+
+        return response()->json(compact('token', 'user'));
     }
 
     public function register(Request $request) 
     {
+        $this->validate($request, [
+            'nickname' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6',
+        ]);
 
+        try {
+            $user = User::create([
+                'nickname' => $request->nickname,
+                'email' => $request->email,
+                'password' => app('hash')->make($request->password)
+            ]);
+
+        } catch(Exception $e) {
+            return response()->json(['error' => 'User could not be created'], 500);
+        }
+        
+        return response()->json(['success' => 'User has been successfully created'], 200);
+    }
+
+    public function protected() 
+    {
+        return ['sjeos' => 'Success'];
     }
 }
