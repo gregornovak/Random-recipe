@@ -22,4 +22,12 @@ class Ingredient extends Model
      */
     protected $hidden = [];
 
+    /**
+     * Get the recipe associated with this ingredient.
+     */
+    public function recipe()
+    {
+        return $this->belongsTo('App\Recipe');
+    }
+
 }

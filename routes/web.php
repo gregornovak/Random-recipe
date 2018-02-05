@@ -24,4 +24,7 @@ $router->post('auth/register', 'AuthController@register');
 
 $router->group(['middleware' => 'auth'], function () use ($router) {
     $router->get('protected', 'AuthController@protected');
+    $router->get('ingredients/{id}', 'IngredientsController@show');    
+    $router->get('ingredients', 'IngredientsController@index');
+    $router->post('ingredients', 'IngredientsController@store');
 });

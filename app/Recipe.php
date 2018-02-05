@@ -21,5 +21,30 @@ class Recipe extends Model
      * @var array
      */
     protected $hidden = [];
+    
+    /**
+     * Get the user associated with this recipe.
+     */
+    public function user()
+    {
+        return $this->belongsTo('App\User');
+    }
+
+    /**
+     * Get the ingredients associated with this recipe.
+     */
+    public function ingredients()
+    {
+        return $this->hasMany('App\Ingredient');
+    }
+
+    /**
+     * Get the categories that this recipe is in.
+     */
+    public function categories()
+    {
+        return $this->belongsToMany('App\Category');
+    }
+
 
 }

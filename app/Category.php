@@ -21,4 +21,12 @@ class Category extends Model
      * @var array
      */
     protected $hidden = [];
+
+    /**
+     * Get the recipes that belong to this category.
+     */
+    public function recipes()
+    {
+        return $this->belongsToMany('App\Recipe');
+    }
 }

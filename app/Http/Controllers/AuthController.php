@@ -25,6 +25,11 @@ class AuthController extends Controller
         $this->jwt = $jwt;
     }
 
+    /**
+     * Authenticate the user.
+     * 
+     * @return User
+     */
     public function authenticate(Request $request)
     {
         $this->validate($request, [
@@ -52,6 +57,11 @@ class AuthController extends Controller
         return response()->json(compact('token', 'user'));
     }
 
+    /**
+     * Register a new user.
+     * 
+     * @return json
+     */
     public function register(Request $request) 
     {
         $this->validate($request, [
